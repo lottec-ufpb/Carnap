@@ -385,7 +385,7 @@ createSubmitButton w bw submit opts =
       case M.lookup "submission" opts of
          Just s | take 7 s == "saveAs:" -> do
              let l = Prelude.drop 7 s
-             bt <- doneButton w "Submit"
+             bt <- doneButton w "Enviar"
              appendChild bw (Just bt)
              submitter <- newListener $ submit l
              addListener bt click submitter False                

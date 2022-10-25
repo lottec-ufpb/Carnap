@@ -73,7 +73,7 @@ activateTruthTables w (Just (i,o,opts)) = do
                           doOnce o change False $ liftIO $ btStatus Edited
                           if "nocheck" `inOpts` opts then return () 
                           else do
-                              bt2 <- questionButton w "Check"
+                              bt2 <- questionButton w "Verificar"
                               appendChild bw (Just bt2)
                               checkIt <- newListener $ checkTable wrap ref check
                               addListener bt2 click checkIt False                
@@ -81,10 +81,10 @@ activateTruthTables w (Just (i,o,opts)) = do
                 _ -> print "truth table was missing an option"
           checkTable wrap ref check = liftIO $ do correct <- check
                                                   if correct 
-                                                      then do message "Success!"
+                                                      then do message "Correto!"
                                                               writeIORef ref True
                                                               setSuccess w wrap 
-                                                      else do message "Something's not quite right"
+                                                      else do message "Há algo errado."
                                                               writeIORef ref False
                                                               setFailure w wrap
 
@@ -102,7 +102,7 @@ submitTruthTable w opts wrap ref check values s l =
                      --truth table as correct.
                      else if "exam" `inOpts` opts
                              then trySubmit w TruthTable opts l (TruthTableDataOpts (pack s) tabulated (M.toList opts)) correct
-                             else do message "not yet finished (do you still need to check your answer?)"
+                             else do message "Ainda não terminado (vocẽ já verificou sua resposta?)"
                                      liftIO $ setFailure w wrap
 
 -------------------------

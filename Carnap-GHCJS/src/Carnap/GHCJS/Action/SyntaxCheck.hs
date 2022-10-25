@@ -61,11 +61,11 @@ tryMatch o ref w sf opts = onEnter $
                        then case children (fst x) of 
                                [] -> shorten x xs stage
                                children -> updateGoal x (zip children [(stage + 1)..]) xs (stage + length children + 1)
-                       else do message $ "Sorry, that's not the main connective. Try again!"
+                       else do message $ "Isto não é o operador principal. Tente novamente!"
                                resetGoal
                    Left e -> case children (fst x) of
                           [] -> shorten x xs stage
-                          _ -> message "what you've entered doesn't appear to be a connective"
+                          _ -> message "Aparentemente o que você enviou não é um operador"
         where optlist = case M.lookup "options" opts of Just s -> words s; Nothing -> []
               --updates the goal, by adding labeled formulas to the todo ist, 
               --developing the tree with those labeled formulas at the given label, and 
@@ -164,4 +164,4 @@ submitSyn :: IsEvent e => Document -> M.Map String String -> IORef (PureForm,[(P
 submitSyn w opts ref l = do (f,forms,_,_) <- liftIO $ readIORef ref
                             case forms of 
                                [] -> do trySubmit w SyntaxCheck opts l (ProblemContent (pack $ show f)) True
-                               _  -> message "not yet finished"
+                               _  -> message "Você ainda não terminou."

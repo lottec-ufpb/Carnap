@@ -43,7 +43,7 @@ submitQualitative w opts wrap ref g l = do
            isExam = "exam" `inOpts` opts
        if isExam then trySubmit w Qualitative opts l submission isDone 
                  else if isDone then trySubmit w Qualitative opts l submission isDone >> setSuccess w wrap
-                                else message "Not quite right. Try again?" >> setFailure w wrap
+                                else message "Não está correto. Tente mais uma vez?" >> setFailure w wrap
 
 submitQualitativeSelection :: IsEvent e => Document -> M.Map String String -> Element -> IORef (Bool, Map String Bool) -> String -> String -> EventM Element e ()
 submitQualitativeSelection w opts wrap ref g l = do 
@@ -52,16 +52,16 @@ submitQualitativeSelection w opts wrap ref g l = do
            isExam = "exam" `inOpts` opts
        if isExam then trySubmit w Qualitative opts l submission isDone 
                  else if isDone then trySubmit w Qualitative opts l submission isDone >> setSuccess w wrap
-                                else message "Not quite right. Try again?" >> setFailure w wrap
+                                else message "Não está correto. Tente mais uma vez?" >> setFailure w wrap
 
 submitNumerical :: IsEvent e => Document -> M.Map String String -> Element -> Element -> Double -> String -> String -> EventM Element e ()
 submitNumerical w opts wrap input g p l = do 
        Just ival <- liftIO $ I.getValue . castToHTMLInputElement $ input
        case readNumeric ival of
-         Nothing -> message "Couldn't read the input. Try again?"
+         Nothing -> message  "Não foi possível ler os dados enviados. Tente mais uma vez?"
          Just val | "exam" `inOpts` opts -> trySubmit w Qualitative opts l (QualitativeNumericalData (pack p) val (toList opts)) (val == g)
          Just val | val == g -> trySubmit w Qualitative opts l (QualitativeNumericalData (pack p) val (toList opts)) True >> setSuccess w wrap
-         _ -> message "Not quite right. Try again?" >> setFailure w wrap
+         _ -> message "Não está correto. Tente mais uma vez?" >> setFailure w wrap
 
 submitEssay :: IsEvent e => Document -> M.Map String String -> Element -> Element -> String -> String -> EventM HTMLTextAreaElement e ()
 submitEssay w opts wrap text g l = do 
@@ -70,7 +70,7 @@ submitEssay w opts wrap text g l = do
        case (manswer,credit) of 
             (Just answer,Just "onSubmission") -> trySubmit w Qualitative opts l (QualitativeProblemDataOpts (pack g) (pack answer) (toList opts)) True >> setSuccess w wrap
             (Just answer,_) -> trySubmit w Qualitative opts l (QualitativeProblemDataOpts (pack g) (pack answer) (toList opts)) False >> setSuccess w wrap
-            (Nothing,_) -> message "It doesn't look like an answer has been written"
+            (Nothing,_) -> message "Não parece que uma resposta foi escrita"
 
 createMultipleSelection :: Document -> Element -> Element -> M.Map String String -> IO ()
 createMultipleSelection w i o opts = case M.lookup "goal" opts of
@@ -177,14 +177,14 @@ createNumerical w i o opts = case (M.lookup "goal" opts >>= getGoal, M.lookup "p
             Just t -> I.setValue (castToHTMLInputElement input) (Just t)
             _ -> return ()
         if "check" `inOpts` opts then do
-              bt2 <- questionButton w "Check"
+              bt2 <- questionButton w "Verificar"
               appendChild bw (Just bt2)
               checkIt <- newListener $ liftIO $ do 
                               Just ival <- I.getValue . castToHTMLInputElement $ input
                               case readNumeric ival of
-                                  Nothing -> message "Couldn't read the input. Try again?" >> setFailure w wrap
-                                  Just v | v == g -> message "Correct!" >> setSuccess w wrap
-                                  _ -> message "Not quite right. Try again?" >> setFailure w wrap
+                                  Nothing -> message "Não foi possível ler os dados enviados. Tente mais uma vez?" >> setFailure w wrap
+                                  Just v | v == g -> message "Correto!" >> setSuccess w wrap
+                                  _ -> message "Não está correto. Tente mais uma vez?" >> setFailure w wrap
               addListener bt2 click checkIt False                
         else return ()
         case M.lookup "submission" opts of
@@ -255,11 +255,11 @@ isChecked opts s = if "nocipher" `inOpts` opts
 
 addChecker :: Document -> Element -> Element -> IORef (Bool,a) -> IO ()
 addChecker w bw wrap ref = do 
-      bt2 <- questionButton w "Check"
+      bt2 <- questionButton w "Verificar"
       appendChild bw (Just bt2)
       checkIt <- newListener $ liftIO $ do 
                       (isDone,_) <- readIORef ref
                       if isDone 
-                          then message "Correct!" >> setSuccess w wrap
-                          else message "Not quite right. Try again?" >> setFailure w wrap
+                          then message "Correto!" >> setSuccess w wrap
+                          else message "Não está correto. Tente mais uma vez?" >> setFailure w wrap
       addListener bt2 click checkIt False

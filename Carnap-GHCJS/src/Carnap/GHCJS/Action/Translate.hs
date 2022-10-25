@@ -114,15 +114,15 @@ tryTrans w parser equiv tests wrapper ref fs = onEnter $
                          Right f -> liftIO $ case tests f of
                                                   Nothing -> checkForm f
                                                   Just msg -> writeIORef ref False >> message ("Looks like " ++ msg ++ ".")
-                         Left e -> message "Sorry, try again---that formula isn't grammatical."
+                         Left e -> message "Esta fórmula não é gramaticalmente correta. Tente novamente." 
    where checkForm f' 
-            | f' `elem` fs = do message "Perfect match!"
+            | f' `elem` fs = do message "Perfeito!"
                                 writeIORef ref True
                                 setSuccess w wrapper
-            | any (\f -> f' `equiv` f) fs = do message "Correct!"
+            | any (\f -> f' `equiv` f) fs = do message "Correto!"
                                                writeIORef ref True
                                                setSuccess w wrapper
-            | otherwise = do message "Not quite. Try again?"
+            | otherwise = do message "Resposta incorreta. Tente novamente."
                              writeIORef ref False 
                              setFailure w wrapper
 
@@ -137,11 +137,11 @@ submitTrans w opts i ref fs parser checker tests l =
                         Right f' | tests f' == Nothing && any (\f -> checker f f') fs -> 
                             trySubmit w Translation opts l (TranslationDataOpts (serialize fs) (pack v) (M.toList opts)) True
                         Left _ | "checksyntax" `inOpts` opts -> 
-                            message "Can't read this. Please double check syntax before submitting."
+                            message "Não é possível ler isto. Por favor verifique a sintaxe antes de enviar"
                         _ | "exam" `inOpts` opts -> 
                             trySubmit w Translation opts l (TranslationDataOpts (serialize fs) (pack v) (M.toList opts)) False
-                        _ -> message "Something is wrong... try again?"
-                else message "Not yet finished (remember to press return to check your work before submitting!)"
+                        _ -> message "Algo deu errado.... tente de novo."
+                else message "Você não terminou ainda (lembre-se de pressionar 'enter' em seu teclado para verificar sua resposta antes de enviar)"
     where serialize :: Show a => [a] -> Text
           serialize = pack . tail . init . show --we drop the list brackets
 
